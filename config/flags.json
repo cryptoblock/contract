@@ -1,0 +1,53 @@
+[
+  {
+    "option": "help",
+    "-": "-h",
+    "--": "--help",
+    "description": "List of all available flags"
+  },
+
+  {
+    "option": "host",
+    "-": "",
+    "--": "--host",
+    "description": "RPC host"
+  },
+  {
+    "option": "port",
+    "-": "-p",
+    "--": "--port",
+    "description": "RPC port"
+  },
+
+  {
+    "option": "file",
+    "-": "-f",
+    "--": "--file",
+    "description": "Path to contract file"
+  },
+  {
+    "option": "address",
+    "-": "-a",
+    "--": "--address",
+    "description": "Hexadecimal address (without leading 0x)"
+  },
+
+  {
+    "option": "compile",
+    "-": "-c",
+    "--": "--compile",
+    "description": "Compile contract"
+  },
+  {
+    "option": "deploy",
+    "-": "-d",
+    "--": "--deploy",
+    "description": "Deploy contract"
+  },
+  {
+    "option": "instantiate",
+    "-": "-i",
+    "--": "--instantiate",
+    "description": "Instantiate contract"
+  }
+]
