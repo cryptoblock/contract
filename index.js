@@ -8,7 +8,7 @@ var contract = require('./lib/contract')
   , utils = require('./lib/utils')
 
 
-var argv = minimist(process.argv.slice(2))
+var argv = minimist(process.argv.slice(2), {string: ['a', 'address']})
 
 if (argv.h || argv.help) {
   utils.help()
