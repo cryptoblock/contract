@@ -19,7 +19,7 @@ if (!argv.f && !argv.file) {
   console.log('Specify contract file')
   process.exit()
 }
-var source = fs.readFileSync(path.join(__dirname, process.argv[3]), 'utf8')
+var source = fs.readFileSync(path.join(__dirname, argv.f || argv.file), 'utf8')
 
 
 contract.connect(argv.host, argv.p || argv.port)
