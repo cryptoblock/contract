@@ -7,6 +7,15 @@
 4. `contract -h` see all available flags
 
 
+### Interactive Usage
+
+```bash
+$ contract -f <path_to_file>
+contract-tools$ -d
+contract-tools$ -a 0x241bbd0ef9492aa17866c662b750f24003c812c6 -i notereth
+notereth$ notereth.newDocument('hash', {from: web3.eth.coinbase, gas: 1800000})
+```
+
 ### Compile
 
 ```bash
