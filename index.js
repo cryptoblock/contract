@@ -5,7 +5,7 @@ var fs = require('fs')
 var web3 = require('web3')
 var minimist = require('minimist')
   , inquirer = require('inquirer')
-  , chalk = require('chalk')
+  , c = require('chalk')
 var contract = require('./lib/contract')
   , prompt = require('./lib/prompt')
   , utils = require('./lib/utils')
@@ -31,27 +31,27 @@ if (argv.h || argv.help) {
 }
 
 if (!argv.f && !argv.file) {
-  console.log('Specify contract file')
+  console.log(c.red('Specify contract file'))
   process.exit()
 }
 
 
 contract.connect(argv.host, argv.p || argv.port)
-console.log(chalk.red('Not connected!'))
+console.log(c.red('Not connected!'))
 
 setInterval(function () {
   var connected = web3.isConnected()
   if (connected) {
     if (connected !== state.connected) {
       state.connected = connected
-      console.log(chalk.green('Connected!'))
+      console.log(c.green('Connected!'))
       run()
     }
   }
   else {
     if (connected !== state.connected) {
       state.connected = connected
-      console.log(chalk.red('Not connected!'))
+      console.log(c.red('Not connected!'))
     }
   }
 }, 1000)
@@ -59,7 +59,7 @@ setInterval(function () {
 function run() {
   inquirer.prompt([state.cli], function (result) {
     if (!state.connected) {
-      console.log(chalk.red('Not connected!'))
+      console.log(c.red('Not connected!'))
       run()
       return
     }
