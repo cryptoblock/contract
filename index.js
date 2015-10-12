@@ -5,11 +5,25 @@ var fs = require('fs')
 var web3 = require('web3')
 var minimist = require('minimist')
   , inquirer = require('inquirer')
+  , chalk = require('chalk')
 var contract = require('./lib/contract')
+  , prompt = require('./lib/prompt')
   , utils = require('./lib/utils')
 
-
 var argv = minimist(process.argv.slice(2), {string: ['a', 'address']})
+
+var state = {
+  connected: false,
+  source: fs.readFileSync(path.join(__dirname, argv.f || argv.file), 'utf8'),
+  name: '',
+  contract: null,
+  cli: {
+    type: 'input',
+    name: 'command',
+    message: 'contract-tools$'
+  }
+}
+
 
 if (argv.h || argv.help) {
   utils.help()
@@ -21,68 +35,37 @@ if (!argv.f && !argv.file) {
   process.exit()
 }
 
-var state = {
-  source: fs.readFileSync(path.join(__dirname, argv.f || argv.file), 'utf8'),
-  name: '',
-  contract: null
-}
 
 contract.connect(argv.host, argv.p || argv.port)
+console.log(chalk.red('Not connected!'))
 
-
-function _process (argv, done) {
-  if (argv.h || argv.help) {
-    utils.help()
-    done()
-  }
-
-  // commands
-
-  if (argv.c || argv.compile) {
-    var compiled = contract.compile(state.source)
-    utils.json(compiled)
-    done()
-  }
-
-  else if (argv.d || argv.deploy) {
-    var accountAddress = utils.pick(argv.a || argv.address) || web3.eth.accounts[0]
-
-    contract.deploy(state.source, accountAddress, function (err, contract) {
-      if (err) console.log(err)
-      utils.json(contract)
-      done()
-    })
-  }
-
-  else if (argv.i || argv.instantiate) {
-    var contractAddress = utils.pick(argv.a || argv.address)
-    if (!contractAddress) {
-      console.log('Specify contract address')
-      done()
-      return
+setInterval(function () {
+  var connected = web3.isConnected()
+  if (connected) {
+    if (connected !== state.connected) {
+      state.connected = connected
+      console.log(chalk.green('Connected!'))
+      run()
     }
-
-    state.name = argv.i || argv.instantiate
-    state.contract = contract.instantiate(state.source, contractAddress)
-    cli[0].message = state.name + '$'
-    console.log(state.contract)
-    done()
   }
-}
-
-var cli = [
-  {
-    type: 'input',
-    name: 'command',
-    message: 'contract-tools$'
+  else {
+    if (connected !== state.connected) {
+      state.connected = connected
+      console.log(chalk.red('Not connected!'))
+    }
   }
-]
+}, 1000)
 
 function run() {
-  inquirer.prompt(cli, function (result) {
-    if (cli[0].message === 'contract-tools$') {
+  inquirer.prompt([state.cli], function (result) {
+    if (!state.connected) {
+      console.log(chalk.red('Not connected!'))
+      run()
+      return
+    }
+    if (state.cli.message === 'contract-tools$') {
       var argv = minimist(result.command.split(' '), {string: ['a', 'address']})
-      _process(argv, run)
+      prompt.process(argv, state, run)
     }
     else {
       console.log(result.command.replace(state.name, 'state.contract'))
@@ -91,5 +74,3 @@ function run() {
     }
   })
 }
-
-run()
