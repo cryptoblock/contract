@@ -9,6 +9,7 @@ var minimist = require('minimist')
 var contract = require('./lib/contract')
   , prompt = require('./lib/prompt')
   , utils = require('./lib/utils')
+  , log = utils.log
 
 var argv = minimist(process.argv.slice(2), {string: ['a', 'address']})
 
@@ -31,27 +32,27 @@ if (argv.h || argv.help) {
 }
 
 if (!argv.f && !argv.file) {
-  console.log(c.red('Specify contract file'))
+  log(c.red('Specify contract file'))
   process.exit()
 }
 
 
 contract.connect(argv.host, argv.p || argv.port)
-console.log(c.red('Not connected!'))
+log(c.red('Not connected!'))
 
 setInterval(function () {
   var connected = web3.isConnected()
   if (connected) {
     if (connected !== state.connected) {
       state.connected = connected
-      console.log(c.green('Connected!'))
+      log(c.green('Connected!'))
       run()
     }
   }
   else {
     if (connected !== state.connected) {
       state.connected = connected
-      console.log(c.red('Not connected!'))
+      log(c.red('Not connected!'))
     }
   }
 }, 1000)
@@ -59,7 +60,7 @@ setInterval(function () {
 function run() {
   inquirer.prompt([state.cli], function (result) {
     if (!state.connected) {
-      console.log(c.red('Not connected!'))
+      log(c.red('Not connected!'))
       run()
       return
     }
@@ -68,7 +69,7 @@ function run() {
       prompt.process(argv, state, run)
     }
     else {
-      console.log(result.command.replace(state.name, 'state.contract'))
+      log(result.command.replace(state.name, 'state.contract'))
       eval(result.command.replace(state.name, 'state.contract'))
       run()
     }
