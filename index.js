@@ -6,6 +6,7 @@ var web3 = require('web3')
 var minimist = require('minimist')
   , inquirer = require('inquirer')
   , c = require('chalk')
+  , async = require('async')
 var contract = require('./lib/contract')
   , prompt = require('./lib/prompt')
   , utils = require('./lib/utils')
@@ -40,22 +41,26 @@ if (!argv.f && !argv.file) {
 contract.connect(argv.host, argv.p || argv.port)
 log(c.red('Not connected!'))
 
-setInterval(function () {
-  var connected = web3.isConnected()
-  if (connected) {
-    if (connected !== state.connected) {
-      state.connected = connected
-      log(c.green('Connected!'))
-      run()
-    }
-  }
-  else {
-    if (connected !== state.connected) {
-      state.connected = connected
-      log(c.red('Not connected!'))
-    }
-  }
-}, 1000)
+async.forever(function (done) {
+  setTimeout(function () {
+    utils.isConnectedAsync(argv.host, argv.p || argv.port, function (connected) {
+      if (connected) {
+        if (connected !== state.connected) {
+          state.connected = connected
+          log(c.green('Connected!'))
+          run()
+        }
+      }
+      else {
+        if (connected !== state.connected) {
+          state.connected = connected
+          log(c.red('Not connected!'))
+        }
+      }
+      done()
+    })
+  }, 1000)
+})
 
 function run() {
   inquirer.prompt([state.cli], function (result) {
