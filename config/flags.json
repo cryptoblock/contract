@@ -24,13 +24,31 @@
     "--": "--file",
     "description": "Path to contract file"
   },
+  {
+    "option": "watch",
+    "-": "-w",
+    "--": "--watch",
+    "description": "Watch a contract file for changes"
+  },
+  {
+    "option": "verbose",
+    "-": "-v",
+    "--": "--verbose",
+    "description": "Set verbosity level"
+  },
 
 
   {
     "option": "address",
     "-": "-a",
     "--": "--address",
-    "description": "Hexadecimal address (without leading 0x)"
+    "description": "Hexadecimal address"
+  },
+  {
+    "option": "name",
+    "-": "-n",
+    "--": "--name",
+    "description": "Set contract instance name"
   },
 
   {
@@ -49,6 +67,6 @@
     "option": "instantiate",
     "-": "-i",
     "--": "--instantiate",
-    "description": "Instantiate contract by name"
+    "description": "Instantiate contract"
   }
 ]
