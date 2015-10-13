@@ -26,6 +26,15 @@ var state = {
   }
 }
 
+function watch (err, result) {
+  if (err) {
+    console.log(err)
+  }
+  else {
+    utils.json(result)
+  }
+}
+
 
 if (argv.h || argv.help) {
   utils.help()
@@ -75,6 +84,11 @@ function run() {
     }
     else {
       log(result.command.replace(state.name, 'state.contract'))
+
+      if (/.*\.watch$/.test(result.command)) {
+        result.command += ['(', watch.toString(), ')'].join('')
+      }
+
       eval(result.command.replace(state.name, 'state.contract'))
       run()
     }
