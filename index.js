@@ -8,6 +8,7 @@ var vorpal = require('vorpal')
 var RPC = require('./lib/rpc')
 var Contract = require('./lib/contract')
 var utils = require('./lib/utils')
+require('babel/polyfill')
 
 var argv = minimist(process.argv.slice(2), {string: ['a', 'address']})
 
@@ -20,6 +21,8 @@ if (!argv.f && !argv.file) {
   console.log('Specify contract file')
   process.exit()
 }
+
+utils.promisify()
 
 var cli = vorpal()
 
@@ -66,8 +69,8 @@ contract.on('deployed', function (contract) {
 
 cli
   .command('compile', 'Compile contract')
-  .action(function (args, done) {
-    var compiled = contract.compile()
+  .action(async (args, done) => {
+    var compiled = await contract.compile()
     log('Contract', compiled, true)
     done()
   })
