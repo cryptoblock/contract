@@ -1,96 +1,130 @@
 #!/usr/bin/env node
 
 var fs = require('fs')
-  , path = require('path')
+var path = require('path')
 var web3 = require('web3')
 var minimist = require('minimist')
-  , inquirer = require('inquirer')
-  , c = require('chalk')
-  , async = require('async')
-var contract = require('./lib/contract')
-  , prompt = require('./lib/prompt')
-  , utils = require('./lib/utils')
-  , log = utils.log
+var vorpal = require('vorpal')
+var RPC = require('./lib/rpc')
+var Contract = require('./lib/contract')
+var utils = require('./lib/utils')
 
 var argv = minimist(process.argv.slice(2), {string: ['a', 'address']})
 
-var state = {
-  connected: false,
-  source: fs.readFileSync(path.join(__dirname, argv.f || argv.file), 'utf8'),
-  name: '',
-  contract: null,
-  cli: {
-    type: 'input',
-    name: 'command',
-    message: 'contract-tools$'
-  }
-}
-
-function watch (err, result) {
-  if (err) {
-    console.log(err)
-  }
-  else {
-    utils.json(result)
-  }
-}
-
-
 if (argv.h || argv.help) {
-  utils.help()
+  // log.help()
   process.exit()
 }
 
 if (!argv.f && !argv.file) {
-  log(c.red('Specify contract file'))
+  console.log('Specify contract file')
   process.exit()
 }
 
+var cli = vorpal()
 
-contract.connect(argv.host, argv.p || argv.port)
-log(c.red('Not connected!'))
+function log (type, value, json) {
+  cli.log.apply(cli, utils.log(type, value, json))
+}
 
-async.forever(function (done) {
-  setTimeout(function () {
-    utils.isConnectedAsync(argv.host, argv.p || argv.port, function (connected) {
-      if (connected) {
-        if (connected !== state.connected) {
-          state.connected = connected
-          log(c.green('Connected!'))
-          run()
-        }
-      }
-      else {
-        if (connected !== state.connected) {
-          state.connected = connected
-          log(c.red('Not connected!'))
-        }
-      }
-      done()
-    })
-  }, 1000)
+var account = {}
+
+// RPC
+
+var rpc = new RPC({host: argv.host, port: argv.p || argv.port})
+
+rpc.on('connection', function (connected) {
+  if (connected) {
+    log('RPC', 'Connected!')
+  }
+  else {
+    log('RPC', 'Disconnected!')
+  }
 })
 
-function run() {
-  inquirer.prompt([state.cli], function (result) {
-    if (!state.connected) {
-      log(c.red('Not connected!'))
-      run()
-      return
-    }
-    if (state.cli.message === 'contract-tools$') {
-      var argv = minimist(result.command.split(' '), {string: ['a', 'address']})
-      prompt.process(argv, state, run)
-    }
-    else {
-      log(result.command.replace(state.name, 'state.contract'))
+log('RPC', rpc.url)
+log('RPC', 'Disconnected!')
+rpc.connect()
+rpc.watch()
 
-      if (/.*\.watch$/.test(result.command)) {
-        result.command += ['(', watch.toString(), ')'].join('')
-      }
+// Contract
 
-      eval(result.command.replace(state.name, 'state.contract'))
-      run()
-    }
+var source = fs.readFileSync(path.join(__dirname, argv.f || argv.file), 'utf8')
+var contract = new Contract(source)
+
+contract.on('deploying', function (contract) {
+  log('Contract', 'Transaction sent!')
+  log('Transaction', contract.transactionHash) // waiting to be mined...
+})
+
+contract.on('deployed', function (contract) {
+  log('Contract', 'Mined!')
+  log('Contract', contract, true)
+})
+
+// CLI
+
+cli
+  .command('compile', 'Compile contract')
+  .action(function (args, done) {
+    var compiled = contract.compile()
+    log('Contract', compiled, true)
+    done()
   })
+cli
+  .command('deploy', 'Deploy contract')
+  .option('-a, --address', 'Account address')
+  .types({string: ['a', 'address']})
+  .action(function (args, done) {
+    var input = utils.pick(args.options.a || args.options.address)
+    var accountAddress = input || web3.eth.accounts[0]
+    // currently stored on deploy
+    account.address = accountAddress
+    contract.deploy(accountAddress)
+    done()
+  })
+cli
+  .command('init', 'Instantiate contract')
+  .option('-a, --address', 'Contract address')
+  .types({string: ['a', 'address']})
+  .action(function (args, done) {
+    var input = utils.pick(args.options.a || args.options.address)
+    var contractAddress = input
+    contract.init(contractAddress)
+    done()
+  })
+cli
+  .command('name <name>', 'Specify contract name')
+  .action(function (args, done) {
+    registerREPL(args.name)
+    contract.name = args.name
+    done()
+  })
+cli
+  .delimiter('contract$')
+  .show()
+
+
+function registerREPL (name) {
+  cli
+    .mode(name)
+    .delimiter(name + ':')
+    .action(function (input, done) {
+      input = 'contract.instance.' + input
+      if (/.*\.watch$/.test(input)) {
+        input += '(' + contractWatch.toString() + ')'
+      }
+      eval(input)
+      done()
+    })
+}
+
+// used for watching contract filters
+function contractWatch (err, result) {
+  if (err) {
+    console.log(err)
+  }
+  else {
+    log('Event', result, true)
+  }
 }

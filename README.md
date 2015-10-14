@@ -1,5 +1,5 @@
 
-# Ethereum Contract Tools
+# Ethereum Contract Tool
 
 
 ## Install
@@ -38,19 +38,19 @@ $ contract -h amazing.com -p 9999 -f <path_to_file>
 Compile the contract:
 
 ```bash
-contract-tools$ -c
+contract$ compile
 ```
 
 Deploy the contract:
 
 ```bash
-contract-tools$ -d
+contract$ deploy
 ```
 
 Additionally set the account address to use when deploying:
 
 ```bash
-contract-tools$ -d -a <account_address>
+contract$ deploy -a <account_address>
 ```
 
 > If omitted account address defaults to the first account `web3.eth.accounts[0]`.
@@ -58,13 +58,25 @@ contract-tools$ -d -a <account_address>
 Instantiate the contract:
 
 ```bash
-contract-tools$ -a <contract_address> -i <contract-name>
+contract$ init -a <contract_address>
+```
+
+Set contract instance name:
+
+```bash
+contract$ name <name>
+```
+
+Enter interactive REPL mode:
+
+```bash
+contract$ <name>
 ```
 
 Execute contract specific methods:
 
 ```bash
-contractname$ contractname.newDocument('hash', {from: web3.eth.coinbase, gas: 1800000})
+contract$ name: newDocument('hash', {from: web3.eth.coinbase, gas: 1800000})
 ```
 
 
@@ -77,11 +89,13 @@ contractname$ contractname.newDocument('hash', {from: web3.eth.coinbase, gas: 18
 # Specify contract file:
 $ contract -f <path_to_file>
 # Deploy the contract using the first unlocked account:
-contract-tools$ -d
-# Instantiate the contract by setting its name and address:
-contract-tools$ -i notereth -a 0x241bbd0ef9492aa17866c662b750f24003c812c6
+contract$ deploy
+# Set contract instance name:
+contract$ name notereth
+# Enter contract interactive REPL:
+contract$ notereth
 # Execute methods from that contract:
-notereth$ notereth.newDocument('hash', {from: web3.eth.coinbase, gas: 1800000})
+notereth$ notereth: newDocument('hash', {from: web3.eth.coinbase, gas: 1800000})
 ```
 
 
@@ -91,13 +105,16 @@ Instantiate the contract in two separate console windows at the same time:
 
 ```bash
 $ contract -f <path_to_file>
-contract-tools$ -i notereth -a 0x241bbd0ef9492aa17866c662b750f24003c812c6
+contract$ init -a 0x241bbd0ef9492aa17866c662b750f24003c812c6
+contract$ name notereth
+contract$ notereth
+contract$ notereth:
 ```
 
 Set a watcher in the first console window:
 
 ```bash
-notereth$ notereth.DocumentEvent({}, {fromBlock: 0, toBlock: 'latest'}).watch
+contract$ notereth$ DocumentEvent({}, {fromBlock: 0, toBlock: 'latest'}).watch
 ```
 
 > Notice that the callback for the `watch` method is missing.
@@ -105,5 +122,5 @@ notereth$ notereth.DocumentEvent({}, {fromBlock: 0, toBlock: 'latest'}).watch
 Execute some command in the second console window:
 
 ```bash
-notereth$ notereth.newDocument('hash', {from: web3.eth.coinbase, gas: 1800000})
+contract$ notereth$ newDocument('hash', {from: web3.eth.coinbase, gas: 1800000})
 ```
