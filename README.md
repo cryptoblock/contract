@@ -4,10 +4,9 @@
 
 ## Install
 
-1. Clone the repo
-2. `npm install` inside the repo
-3. `cd /usr/local/bin && sudo ln -s <path_to_contract_tools/index.js> contract`
-4. `contract -h` see all available flags
+```bash
+$ npm install -g @crypto/contract
+```
 
 
 ## Command Line Options
