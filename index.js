@@ -52,7 +52,7 @@ rpc.watch()
 
 // Contract
 
-var source = fs.readFileSync(path.join(__dirname, argv.f || argv.file), 'utf8')
+var source = fs.readFileSync(path.join(process.cwd(), argv.f || argv.file), 'utf8')
 var contract = new Contract(source)
 
 contract.on('deploying', function (contract) {
