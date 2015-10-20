@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
+import {install} from 'source-map-support'
+install()
+
 var fs = require('fs')
 var path = require('path')
-var web3 = require('web3')
 var minimist = require('minimist')
 var vorpal = require('vorpal')
 var RPC = require('./lib/rpc')
@@ -10,10 +12,12 @@ var Contract = require('./lib/contract')
 var utils = require('./lib/utils')
 require('babel/polyfill')
 
+// args
+
 var argv = minimist(process.argv.slice(2), {string: ['a', 'address']})
 
 if (argv.h || argv.help) {
-  // log.help()
+  console.log('Not implemented!')
   process.exit()
 }
 
@@ -22,15 +26,13 @@ if (!argv.f && !argv.file) {
   process.exit()
 }
 
-utils.promisify()
+// logger
 
 var cli = vorpal()
 
 function log (type, value, json) {
   cli.log.apply(cli, utils.log(type, value, json))
 }
-
-var account = {}
 
 // RPC
 
@@ -47,13 +49,14 @@ rpc.on('connection', function (connected) {
 
 log('RPC', rpc.url)
 log('RPC', 'Disconnected!')
-rpc.connect()
+var web3 = rpc.connect()
+utils.promisify(web3)
 rpc.watch()
 
 // Contract
 
 var source = fs.readFileSync(path.join(process.cwd(), argv.f || argv.file), 'utf8')
-var contract = new Contract(source)
+var contract = new Contract(web3, source)
 
 contract.on('deploying', function (contract) {
   log('Contract', 'Transaction sent!')
@@ -64,6 +67,10 @@ contract.on('deployed', function (contract) {
   log('Contract', 'Mined!')
   log('Contract', contract, true)
 })
+
+// Account
+
+var account = {}
 
 // CLI
 
