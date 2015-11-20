@@ -12,21 +12,22 @@ var paths = {
   sourceRoot: path.join(__dirname)
 }
 
+
 gulp.task('babel', function () {
   return gulp.src(paths.es6)
     .pipe(sourcemaps.init())
     .pipe(babel({
-      optional: [
-        'es7.asyncFunctions',
-        'es7.exportExtensions'
-      ]
+      presets: ['es2015', 'stage-0'],
+      retainLines: 'true'
     }))
     .pipe(sourcemaps.write('.', {sourceRoot: paths.sourceRoot}))
     .pipe(gulp.dest(paths.es5))
 })
 
+gulp.task('build', gulp.series('babel'))
+
 gulp.task('watch', function () {
-  gulp.watch(paths.es6, ['babel'])
+  gulp.watch(paths.es6, gulp.series('babel'))
 })
 
-gulp.task('default', ['watch'])
+gulp.task('default', gulp.series('build', 'watch'))
