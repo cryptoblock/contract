@@ -3,14 +3,14 @@
 import {install} from 'source-map-support'
 install()
 
-var fs = require('fs')
-var path = require('path')
-var minimist = require('minimist')
-var vorpal = require('vorpal')
-var RPC = require('./lib/rpc')
-var Contract = require('./lib/contract')
-var utils = require('./lib/utils')
-require('babel/polyfill')
+import fs from 'fs'
+import path from 'path'
+import minimist from 'minimist'
+import vorpal from 'vorpal'
+import RPC from './lib/rpc'
+import Contract from './lib/contract'
+import utils from './lib/utils'
+import {} from 'babel-polyfill'
 
 // args
 
@@ -77,8 +77,13 @@ var account = {}
 cli
   .command('compile', 'Compile contract')
   .action(async (args, done) => {
-    var compiled = await contract.compile()
-    log('Contract', compiled, true)
+    try {
+      var compiled = await contract.compile()
+      log('Contract', compiled, true)
+    }
+    catch (err) {
+      log('Error', err.message)
+    }
     done()
   })
 cli
