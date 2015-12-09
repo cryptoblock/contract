@@ -29,7 +29,7 @@
     "vorpal"        : "1.3.21",
     "prettyjson"    : "1.1.3",
     "chalk"         : "1.1.1",
-    "request"       : "2.65.0",
+    "@request/client": "0.1.0",
     "async"         : "1.4.2"
   },
 
