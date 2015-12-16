@@ -89,13 +89,16 @@ cli
 cli
   .command('deploy', 'Deploy contract')
   .option('-a, --address', 'Account address')
+  .option('-g, --gas', 'Gas amount')
   .types({string: ['a', 'address']})
   .action(function (args, done) {
-    var input = utils.pick(args.options.a || args.options.address)
-    var accountAddress = input || web3.eth.accounts[0]
+    var accountAddress = utils.pick(args.options.a || args.options.address)
+      || web3.eth.accounts[0]
+    var gasAmount = utils.pick(args.options.g || args.options.gas)
+      || 1000000
     // currently stored on deploy
     account.address = accountAddress
-    contract.deploy(accountAddress)
+    contract.deploy(accountAddress, gasAmount)
     done()
   })
 cli
