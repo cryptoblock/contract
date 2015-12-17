@@ -67,6 +67,9 @@ contract.on('deployed', function (contract) {
   log('Contract', 'Mined!')
   log('Contract', contract, true)
 })
+contract.on('error', function (err) {
+  log('Error', err.message)
+})
 
 // Account
 
