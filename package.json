@@ -8,11 +8,11 @@
     "tools"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/cryptoblock/contract",
-  "author": "Simeon Velichkov <simeonvelichkov@gmail.com> (http://simov.github.io)",
+  "homepage": "https://github.com/simov/crypto-contract",
+  "author": "Simeon Velichkov <simeonvelichkov@gmail.com> (https://simov.github.io)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cryptoblock/contract.git"
+    "url": "https://github.com/simov/crypto-contract.git"
   },
   "dependencies": {
     "@request/client": "0.1.0",
